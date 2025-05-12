@@ -10,8 +10,7 @@ const Nav = () => {
       <div className="container  ">
         <div className="flex justify-between">
             <div className="flex flex-row-reverse gap-2 ">
-                
-                <span className="my-auto font-semibold text-xl text-white">KLEDO TEST</span>
+                <span className="my-auto font-semibold text-xl text-white">APP KLEDO</span>
             </div>
           
           <img
