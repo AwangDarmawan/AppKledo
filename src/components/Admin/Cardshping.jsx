@@ -1,103 +1,103 @@
-import React, { useEffect, useState } from 'react'
-import { getShippingComps, searchShipingComps } from '../../Services/Api'
+
+import React, { useEffect, useState, useCallback } from 'react';
+import { useForm } from 'react-hook-form';
+import { getShippingComps, searchShipingComps } from '../../Services/Api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
+import debounce from 'lodash.debounce';
 
+function CardShipping() {
+  const [shippingComps, setShippingComps] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [token, setToken] = useState('');
+  const { register, watch } = useForm();
+  const keyword = watch('search', '');
 
-
-function Cardshping() {
-  const [shippingComps, setShippingComps] = useState([])
-   const [loading, setLoading] = useState(true);
-   const [keyword, setKeyword] = useState('');
   
-
-  // useEffect(() => {
-    const fetchShipping = async (token) => {
-      try {
-        // const token = localStorage.getItem('TOKEN');
-        const response = await getShippingComps(token);
-        setShippingComps(response.data.data); 
-        console.log("data shiping", response.data.data)
-      } catch (error) {
-        console.error('Gagal mengambil data shipping:', error);
-      }
-      finally {
-        setLoading(false); 
-      }
-    };
-
-  //   fetchShipping();
-  // }, []);
-
-
-const handleSearch = async (e) => {
-    const value = e.target.value;
-    setKeyword(value);
-
-    const token = localStorage.getItem('TOKEN');
-
-    if (value.trim() === '') {
-      fetchShipping(token);
-      return;
+  useEffect(() => {
+    const storedToken = localStorage.getItem('TOKEN');
+    setToken(storedToken);
+    if (storedToken) {
+      fetchShipping(storedToken);
+    } else {
+      setLoading(false);
     }
+  }, []);
 
+  // Ambil semua data
+  const fetchShipping = async (token) => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const response = await searchShipingComps(value, token);
-      setShippingComps(response.data.data);
-      console.log("mencari data", response.data.data)
+      const response = await getShippingComps(token);
+      const { data } = response.data;
+      setShippingComps(data);
     } catch (error) {
-      console.error('Gagal melakukan pencarian shipping:', error);
+      console.error('Gagal mengambil data shipping:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  
+ 
+  const debouncedSearch = useCallback(
+    debounce(async (value, token) => {
+      if (!token) return;
+
+      if (value.trim() === '') {
+        fetchShipping(token);
+        return;
+      }
+
+      setLoading(true);
+      try {
+        const response = await searchShipingComps(value, token);
+        const { data } = response.data;
+        setShippingComps(data);
+      } catch (error) {
+        console.error('Gagal melakukan pencarian shipping:', error);
+      } finally {
+        setLoading(false);
+      }
+    }, 500),
+    []
+  );
+
+ 
   useEffect(() => {
-    const token = localStorage.getItem('TOKEN');
-    fetchShipping(token);
-    
-  }, []);
- 
- 
+    if (token) {
+      debouncedSearch(keyword, token);
+    }
+    return () => {
+      debouncedSearch.cancel(); 
+    };
+  }, [keyword, token, debouncedSearch]);
 
   return (
-    <>
-      {/* Main Content */}
-      <main className="flex-1 p-10">
-        {/* Header Card */}
-        <div className="bg-white rounded-lg shadow p-6 ">
-          <div className="flex gap-2">
-            <h2 className="text-xl font-semibold text-gray-700">
-              Shipping Comps
-            </h2>
-            <div className='flex-1 justify-content-between'>
-            <button className="text-white text-center p-2 bg-blue-500  hover:bg-blue-600">
+    <main className="flex-1 p-10">
+      <div className="bg-white rounded-lg shadow p-6">
+        <div className="flex gap-2">
+          <h2 className="text-xl font-semibold text-gray-700">
+            Shipping Comps
+          </h2>
+          <div className="flex-1 justify-content-between">
+            <button className="text-white text-center p-2 bg-blue-500 hover:bg-blue-600">
               <span className="text-lg">+</span>
             </button>
           </div>
-
-          {/* Search Input */}
           <div className="mb-4">
             <input
               type="text"
               placeholder="Cari"
               className="w-64 px-4 py-2 border rounded focus:outline-none"
-              value={keyword}
-            onChange={handleSearch}
+              {...register('search')}
+              disabled={!token}
             />
           </div>
-         </div>
-          {/* Empty Table */}
-            {loading ? (
+        </div>
+
+        {loading ? (
           <div className="flex justify-center items-center py-4">
-            <FontAwesomeIcon
-              icon={faSpinner}
-              spin
-              size="3x"
-              className="text-blue-500"
-            />
+            <FontAwesomeIcon icon={faSpinner} spin size="3x" className="text-blue-500" />
           </div>
         ) : (
           <table className="w-full text-left border-t border-gray-200">
@@ -118,16 +118,12 @@ const handleSearch = async (e) => {
                   <td className="p-3 text-gray-400 italic">Tidak ada data</td>
                 </tr>
               )}
-            
             </tbody>
-           
           </table>
-            )}
-        </div>
-      </main>
-     
-    </>
-  )
+        )}
+      </div>
+    </main>
+  );
 }
 
-export default Cardshping
+export default CardShipping;
