@@ -1,10 +1,13 @@
 
-import React, { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useForm } from 'react-hook-form';
 import { getShippingComps, searchShipingComps } from '../../Services/Api';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 import debounce from 'lodash.debounce';
+import { Link } from 'react-router-dom';
+
+
 
 function CardShipping() {
   const [shippingComps, setShippingComps] = useState([]);
@@ -13,18 +16,6 @@ function CardShipping() {
   const { register, watch } = useForm();
   const keyword = watch('search', '');
 
-  
-  useEffect(() => {
-    const storedToken = localStorage.getItem('TOKEN');
-    setToken(storedToken);
-    if (storedToken) {
-      fetchShipping(storedToken);
-    } else {
-      setLoading(false);
-    }
-  }, []);
-
-  // Ambil semua data
   const fetchShipping = async (token) => {
     setLoading(true);
     try {
@@ -47,7 +38,6 @@ function CardShipping() {
         fetchShipping(token);
         return;
       }
-
       setLoading(true);
       try {
         const response = await searchShipingComps(value, token);
@@ -63,6 +53,16 @@ function CardShipping() {
   );
 
  
+   useEffect(() => {
+    const storedToken = localStorage.getItem('TOKEN');
+    setToken(storedToken);
+    if (storedToken) {
+      fetchShipping(storedToken);
+    } else {
+      setLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (token) {
       debouncedSearch(keyword, token);
@@ -72,17 +72,21 @@ function CardShipping() {
     };
   }, [keyword, token, debouncedSearch]);
 
+  
+
   return (
     <main className="flex-1 p-10">
       <div className="bg-white rounded-lg shadow p-6">
         <div className="flex gap-2">
-          <h2 className="text-xl font-semibold text-gray-700">
+          <h2 className="text-xl font-bold text-gray-700">
             Shipping Comps
           </h2>
           <div className="flex-1 justify-content-between">
-            <button className="text-white text-center p-2 bg-blue-500 hover:bg-blue-600">
+            {token ? (
+            <Link to={"/createshping"} className="text-white text-center p-2 bg-blue-500 hover:bg-blue-600">
               <span className="text-lg">+</span>
-            </button>
+            </Link>
+            ) : null }
           </div>
           <div className="mb-4">
             <input
@@ -109,12 +113,21 @@ function CardShipping() {
             <tbody>
               {shippingComps.length > 0 ? (
                 shippingComps.map((item) => (
-                  <tr key={item.id}>
-                    <td className="p-3">{item.name}</td>
+                  <tr key={item.id} >
+                  <td className="p-3 border-b border-b-gray-100 hover:text-blue-600">
+                    <Link to={`/update-shipping/${item.id}`} state={{ name: item.name }}>
+                        {item.name}
+                      </Link>
+
+                    </td>
+                    {/* <Link to={`/update-shipping/${item.id}`}>
+                  {item.name}
+                    </Link> */}
                   </tr>
                 ))
               ) : (
                 <tr>
+                  
                   <td className="p-3 text-gray-400 italic">Tidak ada data</td>
                 </tr>
               )}
@@ -122,6 +135,7 @@ function CardShipping() {
           </table>
         )}
       </div>
+   
     </main>
   );
 }

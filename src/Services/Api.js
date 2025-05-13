@@ -24,3 +24,24 @@ export const searchShipingComps = (keyword, token) =>
   ,{
     headers: { Authorization: `Bearer ${token}` },
   });
+
+  // Tambah Shiping
+  export const PostShipingComps = (datacreate,token) => 
+  api.post(`${baseUrl}/finance/shippingComps`, datacreate,{
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  
+  //  UPDATE ID 
+export const updateShippingById = (id, updatedata, token) => {
+  return api.put(`${baseUrl}/finance/shippingComps/${id}`,updatedata,
+    {
+      headers: { Authorization: `Bearer ${token}` }
+    }
+  );};
+
+  export const deleteShipingId = (token,id) => {
+  return api.delete(`${baseUrl}/finance/shippingComps/${id}`,
+    {
+      headers: { Authorization: `Bearer ${token}` }
+    }
+  );};
