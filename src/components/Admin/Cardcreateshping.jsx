@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { PostShipingComps } from '../../Services/Api';
 import { toast } from 'react-toastify';
 
-function CardCreateshping() {
+function Cardcreateshping() {
   const { register,handleSubmit,  formState: { errors,isSubmitting} } = useForm({ mode: 'onBlur' });
     const navigate = useNavigate();
 
@@ -72,4 +72,4 @@ function CardCreateshping() {
   )
 }
 
-export default CardCreateshping
+export default Cardcreateshping
