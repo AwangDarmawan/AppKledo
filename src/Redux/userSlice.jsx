@@ -1,4 +1,4 @@
-// ===== File: src/redux/userSlice.js =====
+
 import { createSlice } from '@reduxjs/toolkit';
 
 
@@ -25,7 +25,7 @@ export const userSlice = createSlice({
     logout: (state) => {
       state.user = null;
       state.token = null;
-       localStorage.removeItem('USER');
+      localStorage.removeItem('USER');
       localStorage.removeItem('TOKEN');
     },
   },

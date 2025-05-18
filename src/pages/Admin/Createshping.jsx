@@ -2,7 +2,7 @@ import React from 'react'
 
 import Sidebar from '../../components/Admin/Sidebar'
 import Navadmin from '../../components/Admin/Navadmin'
-import Cardcreateshping from '../../components/Admin/CardCreateshping'
+import Cardcreateshping from '../../components/Admin/Cardcreateshping' 
 
 function Createshping() {
   return (
@@ -11,7 +11,7 @@ function Createshping() {
       <div className="flex h-screen">
         <Sidebar />
       <div className="flex-1  bg-gray-200">
-        <Cardcreateshping />
+        <Cardcreateshping/>
       </div>
     </div>
     </>
